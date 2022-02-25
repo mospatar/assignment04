@@ -2,15 +2,29 @@
 title: "Assignment04"
 author: "Pataranan Srikarn & Ruijia Zhao"
 date: "2/22/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
 ```
+
+```{r include = FALSE}
+def.chunk.hook  <- knitr::knit_hooks$get("chunk")
+knitr::knit_hooks$set(chunk = function(x, options) {
+  x <- def.chunk.hook(x, options)
+  ifelse(options$size != "normalsize", paste0("\n \\", options$size,"\n\n", x, "\n\n \\normalsize"), x)
+})
+
+```
+
 
 The graphs below use the data set from [The Center for Labor Economics
 Department of Economics](https://davidcard.berkeley.edu/data_sets.html)
+
 
 ```{r, message=FALSE}
 library(haven)
@@ -20,3 +34,65 @@ library(tidyverse)
 ```
 
 
+#Graph1
+
+```{r}
+# Wage difference by working experience
+data <- data %>%
+  mutate(wage = wage/100)
+cat_educ <- as.factor(ifelse(data$educ < 10, 'Less than 10 years',
+                             ifelse(data$educ < 15, '10 - 15 years',
+                                    'More than 15 years')))
+data %>%
+  ggplot() +
+  geom_jitter(mapping = aes(x = exper, y = wage, color = factor(cat_educ)), alpha = 1/3) +
+  geom_label(label="More than 15 years", 
+    x=8,
+    y=15,
+    label.size = 0.05,
+    color = "steelblue4",
+    aes(fontface = "italic")) +
+  geom_label(label="10 - 15 years", 
+             x=12,
+             y=11,
+             label.size = 0.05,
+             color = "red2",
+             aes(fontface = "italic")) +
+  geom_label(label="Less than 10 years", 
+             x=17.5,
+             y=6,
+             label.size = 0.05,
+             color = "olivedrab4",
+             aes(fontface = "italic")) +
+  geom_hline(yintercept=5) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "How soon can people with low educaitonal attainment keep up their wages with others?",
+       subtitle = "It takes almost 10 years for people with less than 10 years of schooling to get paid $5/hour compared to those with more than 15 years of schooling.",
+       caption = "Source: https://davidcard.berkeley.edu/data_sets.html",
+       x = "Years of Working",
+       y = "Hourly Wage")
+```
+
+
+\newpage
+#Graph2
+
+```{r}
+cat_nearc4 <- as.factor(ifelse(data$nearc4 == 1, 'Live near 4-year college', 'Live far from 4-year college'))
+data %>%
+  ggplot(aes(x=wage, fill=cat_nearc4, color=cat_nearc4)) +
+  geom_density(position="identity", alpha=0.5) +
+  geom_vline(aes(xintercept = 5),col='black',size = 0.5, linetype = 2) +
+  geom_text(x=8.5, y=0.17, label="Live far from 4-year college", size = 4, color = 'firebrick3') +
+  geom_text(x=10.5, y=0.12, label="Live near 4-year college", size = 4, color = 'darkcyan') +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Do people living near 4-year college have a higher wage?",
+       subtitle = "People living near universities may have more opportunities and connections to get into highly-paid companies.\nAlso, they could also already be wealthy people, for area around universities are typcially expensive.\nThe graph below shows that there's more percentage of people who live near 4-year college at the horly wage of $5 and above, vice versa.",
+       caption = "Source: https://davidcard.berkeley.edu/data_sets.html",
+       x = "Hourly Wage") +
+  theme(plot.title = element_text(size = 16, face = "bold"),
+    plot.subtitle = element_text(size = 10),
+    plot.caption = element_text(face = "italic"))
+```
