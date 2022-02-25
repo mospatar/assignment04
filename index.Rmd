@@ -7,6 +7,7 @@ output:
   html_document: default
 ---
 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
@@ -31,34 +32,59 @@ library(haven)
 data <- read_dta("/Users/mospatar/assignment04/data/CARD.dta")
 library(ggplot2)
 library(tidyverse)
+data <- data %>%
+  mutate(wage = wage/100)
+cat_educ <- as.factor(ifelse(data$educ < 7, "Elementary School or Less",
+                             ifelse(data$educ < 13, "Middle School",
+                                    "College or more")))
 ```
 
+<details>
+<summary>Would race affect wage at the same level of education?</summary>
+```{r}
+# for race, convert numerical variable to categorical variable
+wage <- data %>% mutate(black = as.factor(black))
+```
 
-#Graph1
+```{r}
+#1 differences in wage by race at the same level of education
+ggplot(data = wage, mapping = aes(x = educ, y = wage, fill = black))+
+  geom_bar(stat = "identity", position = "dodge", width = 0.8)+
+  scale_x_continuous(breaks = seq(0,22, by = 1))+
+  scale_y_continuous(breaks = seq(0,21, by = 2))+
+  scale_fill_discrete(name = "Race",
+                    breaks = c("0", "1"),
+                    labels = c("White", "Black"))+
+  labs(title = "Would race affect wage at the same level of education?",
+       subtitle = "With the same number of years of education, \nwhites earn higher hourly wage than blacks.",
+       x = "Years of Education",
+       y = "Hourly Wage",
+       caption = "Source: https://davidcard.berkeley.edu/data_sets.html")
+```
+</details>
+
+\newpage
+<details>
+<summary>How soon can people with low educaitonal attainment keep up their wages with others?</summary>
 
 ```{r}
 # Wage difference by working experience
-data <- data %>%
-  mutate(wage = wage/100)
-cat_educ <- as.factor(ifelse(data$educ < 10, 'Less than 10 years',
-                             ifelse(data$educ < 15, '10 - 15 years',
-                                    'More than 15 years')))
 data %>%
   ggplot() +
-  geom_jitter(mapping = aes(x = exper, y = wage, color = factor(cat_educ)), alpha = 1/3) +
-  geom_label(label="More than 15 years", 
+  geom_jitter(mapping = aes(x = exper, y = wage, color = factor(cat_educ), stroke = 1.5), alpha = 1/3) +
+  geom_label(label="College or more", 
     x=8,
     y=15,
     label.size = 0.05,
     color = "steelblue4",
     aes(fontface = "italic")) +
-  geom_label(label="10 - 15 years", 
+  geom_label(label="Middle School", 
              x=12,
              y=11,
              label.size = 0.05,
              color = "red2",
              aes(fontface = "italic")) +
-  geom_label(label="Less than 10 years", 
+  geom_label(label="Elementary School or Less", 
              x=17.5,
              y=6,
              label.size = 0.05,
@@ -73,10 +99,31 @@ data %>%
        x = "Years of Working",
        y = "Hourly Wage")
 ```
-
+</details>
 
 \newpage
-#Graph2
+<details>
+<summary>Do people with higher knowledge of world work score earn more?</summary>
+```{r}
+#2 relationship between kww score and wage by education background
+ggplot(data = wage, mapping = aes(x = kww, y = wage, color = cat_educ))+
+  geom_point(alpha = 0.85, shape = 18)+
+  geom_smooth(span = 1.2, se = FALSE)+
+  scale_x_continuous(breaks = seq(0,56, by = 4))+
+  scale_y_continuous(breaks = seq(0,22, by = 2))+
+  scale_color_discrete(name = "Education Level",
+                       limits = c("Elementary School or Less", "Middle School", "College or More"))+
+  labs(title = "Do people with higher knowledge of world work score earn more? ",
+       subtitle = "Hourly wage is positively associated with people's KWW Score, \nbut this relationship is not significant for those with elementary school diploma or lower.",
+       x = "Knowledge of World Work Score",
+       y = "Hourly Wage",
+       caption = "Source: https://davidcard.berkeley.edu/data_sets.html")
+```
+</details>
+
+\newpage
+<details>
+<summary>Do people living near 4-year college have a higher wage?</summary>
 
 ```{r}
 cat_nearc4 <- as.factor(ifelse(data$nearc4 == 1, 'Live near 4-year college', 'Live far from 4-year college'))
@@ -96,27 +143,8 @@ data %>%
     plot.subtitle = element_text(size = 10),
     plot.caption = element_text(face = "italic"))
 ```
+</details>
 
-```{r}
-# for race, convert numerical variable to categorical variable
-wage <- data %>% mutate(black = as.factor(black))
-```
 
 \newpage
-#Graph3
-
-```{r}
-#1 differences in wage by race at the same level of education
-ggplot(data = wage, mapping = aes(x = educ, y = wage, fill = black))+
-  geom_bar(stat = "identity", position = "dodge", width = 0.8)+
-  scale_x_continuous(breaks = seq(0,22, by = 1))+
-  scale_y_continuous(breaks = seq(0,21, by = 2))+
-  scale_fill_discrete(name = "Race",
-                    breaks = c("0", "1"),
-                    labels = c("White", "Black"))+
-  labs(title = "Would race affect wage at the same level of education?",
-       subtitle = "With the same number of years of education, \nwhites earn higher hourly wage than blacks.",
-       x = "Years of Education",
-       y = "Hourly Wage",
-       caption = "Source: https://davidcard.berkeley.edu/data_sets.html")
-```
+![Stretch Exercise](/Users/mospatar/assignment04/successful set up.jpeg)
