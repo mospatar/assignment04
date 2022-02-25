@@ -3,8 +3,8 @@ title: "Assignment04"
 author: "Pataranan Srikarn & Ruijia Zhao"
 date: "2/22/2022"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 
@@ -24,10 +24,11 @@ knitr::knit_hooks$set(chunk = function(x, options) {
 
 
 The graphs below use the data set from [The Center for Labor Economics
-Department of Economics](https://davidcard.berkeley.edu/data_sets.html)
+Department of Economics (1967)](https://davidcard.berkeley.edu/data_sets.html)
+\
+\
 
-
-```{r, message=FALSE}
+```{r, echo=FALSE}
 library(haven)
 data <- read_dta("/Users/mospatar/assignment04/data/CARD.dta")
 library(ggplot2)
@@ -39,14 +40,16 @@ cat_educ <- as.factor(ifelse(data$educ < 7, "Elementary School or Less",
                                     "College or more")))
 ```
 
-<details>
-<summary>Would race affect wage at the same level of education?</summary>
-```{r}
+The topic of our study is the effect of education on wages. The first graph shows the relationship between people’s knowledge of world work score (KWW) and their hourly wage. To specify this relationship, we introduced a control variable: educational background, which is correlated with both the score and the hourly wage. As we can see, the KWW score is generally positively associated with an hourly wage. And educational attainment also played a role, as people with only elementary school degrees earned lower hourly wages than those with higher degrees, despite equal KWW scores.  And the positive association between KWW score and hourly wage is linear for people with primary education or lower.
+\
+\
+
+```{r, echo=FALSE}
 # for race, convert numerical variable to categorical variable
 wage <- data %>% mutate(black = as.factor(black))
 ```
 
-```{r}
+```{r, echo=FALSE}
 #1 differences in wage by race at the same level of education
 ggplot(data = wage, mapping = aes(x = educ, y = wage, fill = black))+
   geom_bar(stat = "identity", position = "dodge", width = 0.8)+
@@ -59,15 +62,19 @@ ggplot(data = wage, mapping = aes(x = educ, y = wage, fill = black))+
        subtitle = "With the same number of years of education, \nwhites earn higher hourly wage than blacks.",
        x = "Years of Education",
        y = "Hourly Wage",
-       caption = "Source: https://davidcard.berkeley.edu/data_sets.html")
+       caption = "Source: The Center for Labor Economics Department of Economics")
 ```
-</details>
+
 
 \newpage
-<details>
-<summary>How soon can people with low educaitonal attainment keep up their wages with others?</summary>
-
-```{r}
+\
+\
+\
+\
+From the previous graph, we know that education plays a role in determining hourly wages. The chart below further examines how soon people with lower education levels can keep up with those with higher education. For instance, it will take approximately ten years for people with an elementary school degree or less to receive $5 per hour. On the contrary, people with a college degree and above generally get paid $5 from the very beginning. 
+\
+\
+```{r, echo=FALSE}
 # Wage difference by working experience
 data %>%
   ggplot() +
@@ -93,18 +100,22 @@ data %>%
   geom_hline(yintercept=5) +
   theme_minimal() +
   theme(legend.position = "none") +
-  labs(title = "How soon can people with low educaitonal attainment keep up their wages with others?",
-       subtitle = "It takes almost 10 years for people with less than 10 years of schooling to get paid $5/hour compared to those with more than 15 years of schooling.",
-       caption = "Source: https://davidcard.berkeley.edu/data_sets.html",
+  labs(title = "How soon can people with low educaitonal attainment keep up their wages?",
+       subtitle = "It takes almost 10 years for people with less than 10 years of schooling to get paid $5/hour\ncompared to those with more than 15 years of schooling.",
+       caption = "Source: The Center for Labor Economics Department of Economics",
        x = "Years of Working",
        y = "Hourly Wage")
 ```
-</details>
 
 \newpage
-<details>
-<summary>Do people with higher knowledge of world work score earn more?</summary>
-```{r}
+\
+\
+\
+\
+The previous two graphs show the effect of education on wages. But do people with the same level of education necessarily have the same wages? To examine this question, we introduced a new variable to see the effect of race. The graph shows that whites have higher hourly wages than blacks even if they have the same number of years of education. This suggests that there may be systematic racial differences in the labor market beyond education levels. 
+\
+\
+```{r, echo=FALSE}
 #2 relationship between kww score and wage by education background
 ggplot(data = wage, mapping = aes(x = kww, y = wage, color = cat_educ))+
   geom_point(alpha = 0.85, shape = 18)+
@@ -117,15 +128,18 @@ ggplot(data = wage, mapping = aes(x = kww, y = wage, color = cat_educ))+
        subtitle = "Hourly wage is positively associated with people's KWW Score, \nbut this relationship is not significant for those with elementary school diploma or lower.",
        x = "Knowledge of World Work Score",
        y = "Hourly Wage",
-       caption = "Source: https://davidcard.berkeley.edu/data_sets.html")
+       caption = "Source: The Center for Labor Economics Department of Economics")
 ```
-</details>
+
 
 \newpage
-<details>
-<summary>Do people living near 4-year college have a higher wage?</summary>
-
-```{r}
+\
+\
+\
+People living near universities may have more opportunities and connections to get into highly paid companies. They could also already be wealthy people, for areas around universities are typically expensive. The graph below shows that there's more percentage of people who live near the 4-year college at the hourly wage of $5 and above, vice versa.
+\
+\
+```{r, echo=FALSE}
 cat_nearc4 <- as.factor(ifelse(data$nearc4 == 1, 'Live near 4-year college', 'Live far from 4-year college'))
 data %>%
   ggplot(aes(x=wage, fill=cat_nearc4, color=cat_nearc4)) +
@@ -136,15 +150,15 @@ data %>%
   theme_minimal() +
   theme(legend.position = "none") +
   labs(title = "Do people living near 4-year college have a higher wage?",
-       subtitle = "People living near universities may have more opportunities and connections to get into highly-paid companies.\nAlso, they could also already be wealthy people, for area around universities are typcially expensive.\nThe graph below shows that there's more percentage of people who live near 4-year college at the horly wage of $5 and above, vice versa.",
-       caption = "Source: https://davidcard.berkeley.edu/data_sets.html",
+       subtitle = "Clearly, people who live near 4-year college receive a higer wage.",
+       caption = "Source: The Center for Labor Economics Department of Economics",
        x = "Hourly Wage") +
   theme(plot.title = element_text(size = 16, face = "bold"),
     plot.subtitle = element_text(size = 10),
     plot.caption = element_text(face = "italic"))
 ```
-</details>
 
-
+\
+\
 \newpage
 ![Stretch Exercise](/Users/mospatar/assignment04/successful set up.jpeg)
