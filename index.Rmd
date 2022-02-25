@@ -9,5 +9,14 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-The graphs below use the data set from [Center for Labor Economics
+The graphs below use the data set from [The Center for Labor Economics
 Department of Economics](https://davidcard.berkeley.edu/data_sets.html)
+
+```{r, message=FALSE}
+library(haven)
+data <- read_dta("/Users/mospatar/assignment04/data/CARD.dta")
+library(ggplot2)
+library(tidyverse)
+```
+
+
